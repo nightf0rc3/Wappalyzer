@@ -1,4 +1,4 @@
-# Wappalyzer [![Travis](https://img.shields.io/travis/AliasIO/Wappalyzer.svg)](https://travis-ci.org/AliasIO/Wappalyzer/) [![Scrutinizer](https://scrutinizer-ci.com/g/AliasIO/Wappalyzer/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/AliasIO/Wappalyzer/?branch=master)
+# Wappalyzer
 
 [Wappalyzer](https://www.wappalyzer.com/) is a
 [cross-platform](https://github.com/AliasIO/Wappalyzer/wiki/Drivers) utility that uncovers the
@@ -10,9 +10,62 @@ technologies used on websites. It detects
 [analytics tools](https://www.wappalyzer.com/categories/analytics) and
 [many more](https://www.wappalyzer.com/applications).
 
-*Licensed under the [GPL](https://github.com/AliasIO/Wappalyzer/blob/master/LICENSE).*
+
+## Installation
+
+```shell
+$ npm i wappalyzer
+```
 
 
-## Documentation
+## Run from the command line
 
-Please read the [developer documentation](https://www.wappalyzer.com/docs) to get started.
+```
+node index.js [url] [options]
+```
+
+### Options
+
+```
+  --chunk-size=num     Process links in chunks.
+  --debug=0|1          Output debug messages.
+  --delay=ms           Wait for ms milliseconds between requests.
+  --max-depth=num      Don't analyse pages more than num levels deep.
+  --max-urls=num       Exit when num URLs have been analysed.
+  --max-wait=ms        Wait no more than ms milliseconds for page resources to load.
+  --recursive=0|1      Follow links on pages (crawler).
+  --user-agent=str     Set the user agent string.
+  --html-max-cols=num  Limit the number of HTML characters per line processed.
+  --html-max-rows=num  Limit the number of HTML lines processed.
+```
+
+
+## Run from a script
+
+```javascript
+const options = {
+  debug: false,
+  delay: 500,
+  maxDepth: 3,
+  maxUrls: 10,
+  maxWait: 5000,
+  recursive: true,
+  userAgent: 'Wappalyzer',
+  htmlMaxCols: 2000,
+  htmlMaxRows: 2000,
+};
+
+const wappalyzer = new Wappalyzer('https://www.wappalyzer.com', options);
+
+wappalyzer.analyze()
+  .then(json => {
+    process.stdout.write(JSON.stringify(json, null, 2) + '\n')
+
+    process.exit(0);
+  })
+  .catch(error => {
+    process.stderr.write(error + '\n')
+
+    process.exit(1);
+});
+```

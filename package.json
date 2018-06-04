@@ -1,14 +1,23 @@
 {
+  "name": "wappalyzer",
+  "description": "Uncovers the technologies used on websites",
+  "homepage": "https://github.com/AliasIO/Wappalyzer",
+  "version": "5.4.15",
+  "author": "Elbert Alias",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AliasIO/Wappalyzer"
+  },
+  "main": "driver.js",
+  "files": [
+    "apps.json",
+    "index.js",
+    "driver.js",
+    "wappalyzer.js"
+  ],
   "dependencies": {
-    "file-type": "7.4.*",
-    "is-svg": "2.1.*",
-    "read-chunk": "2.1.*"
-  },
-  "devDependencies": {
-    "chai": "^4.1.2",
-    "mocha": "^5.0.1"
-  },
-  "scripts": {
-    "test": "mocha -R spec ./test"
+    "request": "^2.85.0",
+    "zombie": "^5.0.8"
   }
 }
