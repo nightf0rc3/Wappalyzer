@@ -47,6 +47,9 @@ class Driver {
 
     this.wappalyzer.parseJsPatterns();
 
+    //MODDED
+    this.status = 0;
+
     this.wappalyzer.driver.log = (message, source, type) => this.log(message, source, type);
     this.wappalyzer.driver.displayApps = (detected, meta, context) => this.displayApps(detected, meta, context);
 
@@ -170,7 +173,8 @@ class Driver {
 
       return false;
     }
-
+    //MODDED
+    this.status = resource.response.status;
     if ( resource.response.status !== 200 ) {
       this.wappalyzer.log('Response was not OK; status: ' + resource.response.status + ' ' + resource.response.statusText + '; url: ' + pageUrl.href, 'driver', 'error');
 
@@ -308,7 +312,8 @@ class Driver {
           resolve({
             urls: this.analyzedPageUrls,
             applications: this.apps,
-            meta: this.meta
+            meta: this.meta,
+            status: this.status
           });
         });
     });
