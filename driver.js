@@ -175,11 +175,11 @@ class Driver {
     }
     //MODDED
     this.status = resource.response.status;
-    if ( resource.response.status !== 200 ) {
-      this.wappalyzer.log('Response was not OK; status: ' + resource.response.status + ' ' + resource.response.statusText + '; url: ' + pageUrl.href, 'driver', 'error');
+    // if ( resource.response.status !== 200 ) {
+    //   this.wappalyzer.log('Response was not OK; status: ' + resource.response.status + ' ' + resource.response.statusText + '; url: ' + pageUrl.href, 'driver', 'error');
 
-      return false;
-    }
+    //   return false;
+    // }
 
     const headers = this.getHeaders(browser);
 
