@@ -80,6 +80,8 @@ class Driver {
       maxWait: 5000,
       recursive: false,
       userAgent: 'Mozilla/5.0',
+      apps: [],
+      categories: []
     }, options || {});
 
     this.options.debug = Boolean(+this.options.debug);
@@ -101,19 +103,24 @@ class Driver {
 
     this.wappalyzer = new Wappalyzer();
 
-    this.wappalyzer.apps = json.apps;
-    this.wappalyzer.categories = json.categories;
+    this.wappalyzer.apps = (this.options.apps.length === 0) ? json.apps : this.options.apps;
+    this.wappalyzer.categories = (this.options.categories.length === 0) ? json.categories : this.options.categories;
 
     this.wappalyzer.parseJsPatterns();
-
-    //MODDED
-    this.status = 0;
 
     this.wappalyzer.driver.log = (message, source, type) => this.log(message, source, type);
     this.wappalyzer.driver
       .displayApps = (detected, meta, context) => this.displayApps(detected, meta, context);
 
     process.on('uncaughtException', e => this.wappalyzer.log(`Uncaught exception: ${e.message}`, 'driver', 'error'));
+  }
+
+  reuse(pageUrl) {
+    this.origPageUrl = url.parse(pageUrl);
+    this.analyzedPageUrls = {};
+    this.apps = [];
+    this.meta = {};
+    return this.analyze();
   }
 
   on(event, callback) {
@@ -219,13 +226,6 @@ class Driver {
     if (!browser.statusCode) {
       return reject(new Error('NO_RESPONSE'));
     }
-    //MODDED
-    this.status = resource.response.status;
-    // if ( resource.response.status !== 200 ) {
-    //   this.wappalyzer.log('Response was not OK; status: ' + resource.response.status + ' ' + resource.response.statusText + '; url: ' + pageUrl.href, 'driver', 'error');
-
-    //   return false;
-    // }
 
     if (!browser.contentType || !/\btext\/html\b/.test(browser.contentType)) {
       this.wappalyzer.log(`Skipping; url: ${pageUrl.href}; content type: ${browser.contentType}`, 'driver');
@@ -329,8 +329,7 @@ class Driver {
           resolve({
             urls: this.analyzedPageUrls,
             applications: this.apps,
-            meta: this.meta,
-            status: this.status
+            meta: this.meta
           });
         });
     });
