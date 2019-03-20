@@ -7,8 +7,7 @@
  */
 
 const validation = {
-  hostname: /(www.)?((.+?)\.(([a-z]{2,3}\.)?[a-z]{2,6}))$/,
-  hostnameBlacklist: /((local|dev(elopment)?|stag(e|ing)?|test(ing)?|demo(shop)?|admin|google|cache)\.|\/admin|\.local)/,
+  hostname: /(www.)?((.+?)\.(([a-z]{2,3}\.)?[a-z]{2,6}))$/
 };
 
 /**
@@ -246,9 +245,9 @@ class Wappalyzer {
         this.log(`Identified ${Object.keys(apps).join(', ')} (${url.hostname})`, 'core');
       }
 
-      this.driver.displayApps(this.detected[url.canonical], { language }, context);
+      // this.driver.displayApps(this.detected[url.canonical], { language }, context);
 
-      return resolve();
+      return resolve(this.detected[url.canonical], { language }, context);
     });
   }
 
@@ -478,10 +477,7 @@ class Wappalyzer {
       const app = apps[appName];
 
       if (this.detected[url.canonical][appName].getConfidence() >= 100) {
-        if (
-          validation.hostname.test(url.hostname)
-          && !validation.hostnameBlacklist.test(url.hostname)
-        ) {
+        if (validation.hostname.test(url.hostname)) {
           if (!(hostname in this.hostnameCache)) {
             this.hostnameCache[hostname] = {
               applications: {},
