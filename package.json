@@ -9,7 +9,7 @@
     "type": "git",
     "url": "https://github.com/AliasIO/Wappalyzer"
   },
-  "main": "driver.js",
+  "main": "exp.js",
   "files": [
     "apps.json",
     "browser.js",
