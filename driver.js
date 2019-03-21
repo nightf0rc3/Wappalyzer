@@ -60,7 +60,8 @@ class Driver {
       htmlMaxRows: 3000,
       userAgent: 'Mozilla/5.0',
       apps: [],
-      categories: []
+      categories: [],
+      forwardHtml: false
     }, options || {});
 
     this.options.debug = Boolean(+this.options.debug);
@@ -115,8 +116,8 @@ class Driver {
       html,
       js,
       scripts,
-    });
-    resolve({apps: result, status: browser.statusCode});
+    }, { forwardHtml: this.options.forwardHtml });
+    resolve({apps: result.apps, status: browser.statusCode, context: result.context});
   }
 }
 

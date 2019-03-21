@@ -120,8 +120,6 @@ class Wappalyzer {
     this.driver = {};
     this.jsPatterns = {};
     this.detected = {};
-    this.hostnameCache = {};
-    this.adCache = [];
   }
 
   /**
@@ -136,7 +134,6 @@ class Wappalyzer {
   analyze(url, data, context) {
     const apps = {};
     const promises = [];
-    const startTime = new Date();
     const {
       scripts,
       cookies,
@@ -228,14 +225,12 @@ class Wappalyzer {
       this.resolveImplies(apps, url.canonical);
 
       this.cacheDetectedApps(apps, url.canonical);
-
-      this.log(`Processing ${Object.keys(data).join(', ')} took ${((new Date() - startTime) / 1000).toFixed(2)}s (${url.hostname})`, 'core');
-
-      if (Object.keys(apps).length) {
-        this.log(`Identified ${Object.keys(apps).join(', ')} (${url.hostname})`, 'core');
+      const apps2 = this.detected[url.canonical];
+      delete this.detected[url.canonical];
+      if (context.forwardHtml) {
+        context.html = html;
       }
-
-      return resolve(this.detected[url.canonical], { language }, context);
+      return resolve({apps: apps2, language, context});
     });
   }
 
