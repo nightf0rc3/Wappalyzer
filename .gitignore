@@ -1,8 +1,8 @@
-/build/*
-/src/icons/converted/*
 /node_modules
 /npm-debug.log
 /npm-debug.log
+
+package-lock.json
 
 !.gitkeep
 
@@ -13,3 +13,4 @@ Desktop.ini
 ._*
 tags
 tags.*
+.idea
