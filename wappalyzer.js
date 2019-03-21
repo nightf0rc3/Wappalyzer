@@ -6,9 +6,6 @@
  * License: GPLv3 http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
-const validation = {
-  hostname: /(www.)?((.+?)\.(([a-z]{2,3}\.)?[a-z]{2,6}))$/
-};
 
 /**
  * Enclose string in array
@@ -125,12 +122,6 @@ class Wappalyzer {
     this.detected = {};
     this.hostnameCache = {};
     this.adCache = [];
-
-    this.config = {
-      websiteURL: 'https://www.wappalyzer.com/',
-      twitterURL: 'https://twitter.com/Wappalyzer',
-      githubURL: 'https://github.com/AliasIO/Wappalyzer',
-    };
   }
 
   /**
@@ -237,7 +228,6 @@ class Wappalyzer {
       this.resolveImplies(apps, url.canonical);
 
       this.cacheDetectedApps(apps, url.canonical);
-      this.trackDetectedApps(apps, url, language);
 
       this.log(`Processing ${Object.keys(data).join(', ')} took ${((new Date() - startTime) / 1000).toFixed(2)}s (${url.hostname})`, 'core');
 
@@ -245,93 +235,8 @@ class Wappalyzer {
         this.log(`Identified ${Object.keys(apps).join(', ')} (${url.hostname})`, 'core');
       }
 
-      // this.driver.displayApps(this.detected[url.canonical], { language }, context);
-
       return resolve(this.detected[url.canonical], { language }, context);
     });
-  }
-
-  /**
-   * Cache detected ads
-   */
-  cacheDetectedAds(ad) {
-    this.adCache.push(ad);
-  }
-
-  /**
-   *
-   */
-  robotsTxtAllows(url) {
-    return new Promise(async (resolve, reject) => {
-      const parsed = this.parseUrl(url);
-
-      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-        return reject();
-      }
-
-      const robotsTxt = await this.driver.getRobotsTxt(parsed.host, parsed.protocol === 'https:');
-
-      if (robotsTxt.some(disallowedPath => parsed.pathname.indexOf(disallowedPath) === 0)) {
-        return reject();
-      }
-
-      return resolve();
-    });
-  }
-
-  /**
-   * Parse a URL
-   */
-  parseUrl(url) {
-    const a = this.driver.document.createElement('a');
-
-    a.href = url;
-
-    a.canonical = `${a.protocol}//${a.host}${a.pathname}`;
-
-    return a;
-  }
-
-  /**
-   *
-   */
-  static parseRobotsTxt(robotsTxt) {
-    const disallow = [];
-
-    let userAgent;
-
-    robotsTxt.split('\n').forEach((line) => {
-      let matches = /^User-agent:\s*(.+)$/i.exec(line.trim());
-
-      if (matches) {
-        userAgent = matches[1].toLowerCase();
-      } else if (userAgent === '*' || userAgent === 'wappalyzer') {
-        matches = /^Disallow:\s*(.+)$/i.exec(line.trim());
-
-        if (matches) {
-          disallow.push(matches[1]);
-        }
-      }
-    });
-
-    return disallow;
-  }
-
-  /**
-   *
-   */
-  ping() {
-    if (Object.keys(this.hostnameCache).length > 100) {
-      this.driver.ping(this.hostnameCache);
-
-      this.hostnameCache = {};
-    }
-
-    if (this.adCache.length > 50) {
-      this.driver.ping({}, this.adCache);
-
-      this.adCache = [];
-    }
   }
 
   /**
@@ -457,54 +362,6 @@ class Wappalyzer {
           this.detected[url][appName].confidence[id] = app.confidence[id];
         });
     });
-
-    if (this.driver.ping instanceof Function) {
-      this.ping();
-    }
-  }
-
-  /**
-   * Track detected applications
-   */
-  trackDetectedApps(apps, url, language) {
-    if (!(this.driver.ping instanceof Function)) {
-      return;
-    }
-
-    const hostname = `${url.protocol}//${url.hostname}`;
-
-    Object.keys(apps).forEach((appName) => {
-      const app = apps[appName];
-
-      if (this.detected[url.canonical][appName].getConfidence() >= 100) {
-        if (validation.hostname.test(url.hostname)) {
-          if (!(hostname in this.hostnameCache)) {
-            this.hostnameCache[hostname] = {
-              applications: {},
-              meta: {},
-            };
-          }
-
-          if (!(appName in this.hostnameCache[hostname].applications)) {
-            this.hostnameCache[hostname].applications[appName] = {
-              hits: 0,
-            };
-          }
-
-          this.hostnameCache[hostname].applications[appName].hits += 1;
-
-          if (apps[appName].version) {
-            this.hostnameCache[hostname].applications[appName].version = app.version;
-          }
-        }
-      }
-    });
-
-    if (hostname in this.hostnameCache) {
-      this.hostnameCache[hostname].meta.language = language;
-    }
-
-    this.ping();
   }
 
   /**

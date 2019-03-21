@@ -12,11 +12,6 @@ class ZombieBrowser extends Browser {
       userAgent: options.userAgent,
       waitDuration: options.maxWait,
     });
-
-    this.browser.on('authenticate', (auth) => {
-      auth.username = this.options.username;
-      auth.password = this.options.password;
-    });
   }
 
   visit(url) {
